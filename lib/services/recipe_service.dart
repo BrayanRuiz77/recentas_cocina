@@ -3,8 +3,13 @@ import '../models/recipe.dart';
 import '../utils/constants.dart';
 
 class RecipeService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore;
 
+  // Agregamos inyección de dependencias
+  RecipeService({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  // Agregamos manejo de errores más robusto
   Future<List<Recipe>> getRecipes() async {
     try {
       final snapshot = await _firestore
@@ -16,8 +21,8 @@ class RecipeService {
           .map((doc) => Recipe.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
-      print('Error getting recipes: $e');
-      return [];
+      // Lanzamos una excepción personalizada
+      throw RecipeException('Error getting recipes: $e');
     }
   }
 
@@ -27,8 +32,7 @@ class RecipeService {
           .collection(Constants.recipeCollection)
           .add(recipe.toJson());
     } catch (e) {
-      print('Error adding recipe: $e');
-      throw e;
+      throw RecipeException('Error adding recipe: $e');
     }
   }
 
@@ -39,20 +43,16 @@ class RecipeService {
           .doc(recipe.id)
           .update(recipe.toJson());
     } catch (e) {
-      print('Error updating recipe: $e');
-      throw e;
+      throw RecipeException('Error updating recipe: $e');
     }
   }
+}
 
-  Future<void> deleteRecipe(String recipeId) async {
-    try {
-      await _firestore
-          .collection(Constants.recipeCollection)
-          .doc(recipeId)
-          .delete();
-    } catch (e) {
-      print('Error deleting recipe: $e');
-      throw e;
-    }
-  }
+// Excepción personalizada
+class RecipeException implements Exception {
+  final String message;
+  RecipeException(this.message);
+
+  @override
+  String toString() => message;
 }

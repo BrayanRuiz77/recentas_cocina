@@ -21,6 +21,31 @@ class Recipe {
     this.isFavorite = false,
   });
 
+  // Agregamos método de copia para inmutabilidad
+  Recipe copyWith({
+    String? id,
+    String? title,
+    String? description,
+    List<String>? ingredients,
+    List<String>? instructions,
+    String? imageUrl,
+    String? userId,
+    DateTime? createdAt,
+    bool? isFavorite,
+  }) {
+    return Recipe(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      ingredients: ingredients ?? this.ingredients,
+      instructions: instructions ?? this.instructions,
+      imageUrl: imageUrl ?? this.imageUrl,
+      userId: userId ?? this.userId,
+      createdAt: createdAt ?? this.createdAt,
+      isFavorite: isFavorite ?? this.isFavorite,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -37,15 +62,15 @@ class Recipe {
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
     return Recipe(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      ingredients: List<String>.from(json['ingredients']),
-      instructions: List<String>.from(json['instructions']),
-      imageUrl: json['imageUrl'],
-      userId: json['userId'],
-      createdAt: DateTime.parse(json['createdAt']),
-      isFavorite: json['isFavorite'] ?? false,
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      ingredients: List<String>.from(json['ingredients'] as List),
+      instructions: List<String>.from(json['instructions'] as List),
+      imageUrl: json['imageUrl'] as String,
+      userId: json['userId'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      isFavorite: json['isFavorite'] as bool? ?? false,
     );
   }
 }

@@ -32,7 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 24),
                 TextFormField(
                   controller: _nameController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Name',
                     border: OutlineInputBorder(),
                   ),
@@ -46,7 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Email',
                     border: OutlineInputBorder(),
                   ),
@@ -60,7 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Password',
                     border: OutlineInputBorder(),
                   ),
@@ -81,8 +81,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handleRegister,
                     child: _isLoading
-                        ? CircularProgressIndicator()
-                        : Text('Register'),
+                        ? const CircularProgressIndicator()
+                        : const Text('Register'),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -90,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text('Already have an account? Login'),
+                  child: const Text('Already have an account? Login'),
                 ),
               ],
             ),
@@ -112,11 +112,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
 
         if (user != null) {
+          // Registro exitoso, navegar a la pantalla de inicio
+          // ignore: use_build_context_synchronously
           Navigator.pushReplacementNamed(context, '/home');
+        } else {
+          // Registro fallido (sin excepción), mostrar un SnackBar
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Error de registro. Inténtalo de nuevo.')),
+          );
         }
       } catch (e) {
+        // Capturar y mostrar cualquier excepción
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(content: Text('Error de registro: $e')),
         );
       } finally {
         setState(() => _isLoading = false);

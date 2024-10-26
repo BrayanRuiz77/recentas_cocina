@@ -28,4 +28,6 @@ class ShoppingItem {
       isCompleted: json['isCompleted'] ?? false,
     );
   }
+
+  copyWith({bool? isCompleted}) {}
 }

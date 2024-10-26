@@ -21,10 +21,12 @@ class AuthService {
         password: password,
       );
 
-      if (result.user != null) {
+      final user = result.user;
+
+      if (user != null) {
         // Crear el documento del usuario en Firestore
         final userModel = UserModel(
-          id: result.user!.uid,
+          id: user.uid,
           email: email,
           name: name,
           createdAt: DateTime.now(),
@@ -32,15 +34,25 @@ class AuthService {
 
         await _firestore
             .collection('users')
-            .doc(result.user!.uid)
+            .doc(user.uid)
             .set(userModel.toJson());
-
         return userModel;
+      } else {
+        return null; // Devuelve null si el usuario no se crea
       }
-      return null;
     } catch (e) {
-      print('Error en el registro: $e');
-      rethrow;
+      if (e is FirebaseAuthException) {
+        print('Error de Firebase Auth: ${e.code}, ${e.message}');
+
+        if (e.code == 'weak-password') {
+          throw Exception('La contraseña es demasiado débil.');
+        } else if (e.code == 'email-already-in-use') {
+          throw Exception('El correo electrónico ya está en uso.');
+        }
+      } else {
+        print('Otro error de registro: $e');
+      }
+      rethrow; // Re-lanza la excepción para que se maneje en la UI
     }
   }
 
@@ -56,10 +68,8 @@ class AuthService {
       );
 
       if (result.user != null) {
-        // Obtener los datos del usuario desde Firestore
         final userData =
             await _firestore.collection('users').doc(result.user!.uid).get();
-
         return UserModel.fromJson(userData.data()!);
       }
       return null;
@@ -86,7 +96,6 @@ class AuthService {
       if (user != null) {
         final userData =
             await _firestore.collection('users').doc(user.uid).get();
-
         return UserModel.fromJson(userData.data()!);
       }
       return null;

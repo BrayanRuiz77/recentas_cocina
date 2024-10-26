@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:recetas_cocina/models/recipe.dart';
-import 'package:recetas_cocina/services/recipe_service.dart'; // Asegúrate de tener este servicio
-import 'package:recetas_cocina/widgets/dialogs.dart'; // Para el diálogo de edición
+import 'package:recetas_cocina/services/recipe_service.dart';
+import 'package:recetas_cocina/widgets/dialogs.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   final Recipe recipe;
@@ -76,5 +76,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 }
 
 extension on TextTheme {
-  get headline5 => null;
+  TextStyle? get headline5 =>
+      headlineMedium; //  Usar headlineMedium o definir un nuevo estilo
 }

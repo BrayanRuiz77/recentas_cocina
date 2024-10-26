@@ -1,11 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'firebase_options.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
-import 'services/auth_service.dart';
 import 'screens/home_screen.dart';
+import 'screens/add_recipe_screen.dart';
+import 'services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,15 +33,15 @@ class MyApp extends StatelessWidget {
       title: 'Recipe App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-      ), //  Tema básico por ahora
+      ),
       debugShowCheckedModeBanner: false,
-      home: StreamBuilder(
+      home: StreamBuilder<User?>(
         stream: _authService.authStateChanges,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (snapshot.hasData && snapshot.data != null) {
+          if (snapshot.hasData) {
             return HomeScreen();
           }
           return LoginScreen();
@@ -49,6 +51,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
         '/home': (context) => HomeScreen(),
+        '/add_recipe': (context) => const AddRecipeScreen(),
       },
     );
   }

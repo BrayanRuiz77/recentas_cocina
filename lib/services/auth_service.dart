@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 
 class AuthService {
@@ -79,12 +80,19 @@ class AuthService {
     }
   }
 
-  // Cerrar sesión
-  Future<void> signOut() async {
+  // Cerrar sesión modificado con BuildContext
+  Future<void> signOut(BuildContext context) async {
     try {
       await _auth.signOut();
+      // Navega a la pantalla de login después de cerrar sesión
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
     } catch (e) {
       print('Error al cerrar sesión: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cerrar sesión: $e')),
+      );
       rethrow;
     }
   }

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:recetas_cocina/models/recipe.dart';
 import 'package:recetas_cocina/services/recipe_service.dart';
 import 'package:recetas_cocina/widgets/recipe_card.dart';
-import 'package:recetas_cocina/widgets/custom_tab_bar.dart'; // Para la barra de pestañas personalizada
+import 'package:recetas_cocina/widgets/custom_tab_bar.dart';
+import 'package:recetas_cocina/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -37,33 +40,34 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Recipe App'), // Cambia el título
-        bottom: CustomTabBar(
-            controller: _tabController), // La barra de pestañas personalizada
+        title: const Text('Recipe App'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.logout), // Icono de cerrar sesión
+            onPressed: () async {
+              final authService = AuthService();
+              await authService.signOut(context);
+            },
+          ),
+        ],
+        bottom: CustomTabBar(controller: _tabController),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          // Pestaña de recetas
-          RecipesTab(recipes: _recipes), // Muestra la lista de recetas
-
-          // Pestaña de preparación (Prepare)
-          PrepareTab(), //  Pantalla para mostrar la preparación de una receta
-
-          // Pestaña de la lista de compras (Shopping)
-          ShoppingTab(), //  Pantalla para gestionar la lista de compras
-
-          // Pestaña del plan de comidas (Plan)
-          MealPlanTab(), //  Pantalla para gestionar el plan de comidas
+          RecipesTab(recipes: _recipes), // Lista de recetas
+          PrepareTab(), // Pantalla de preparación
+          ShoppingTab(), // Lista de compras
+          MealPlanTab(), // Plan de comidas
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //  Acción para agregar una nueva receta
-          Navigator.pushNamed(context,
-              '/add_recipe'); // Puedes usar una ruta para agregar una receta
+          if (context.mounted) {
+            Navigator.pushNamed(context, '/add_recipe');
+          }
         },
-        child: Icon(Icons.add), // Icono de agregar
+        child: const Icon(Icons.add), // Icono de agregar
       ),
     );
   }
@@ -74,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen>
 class RecipesTab extends StatelessWidget {
   final List<Recipe> recipes;
 
-  RecipesTab({required this.recipes});
+  const RecipesTab({required this.recipes});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +88,6 @@ class RecipesTab extends StatelessWidget {
         return RecipeCard(
           recipe: recipes[index],
           onTap: () {
-            // Acción para mostrar los detalles de la receta
             Navigator.pushNamed(context, '/recipe_details',
                 arguments: recipes[index]);
           },
@@ -97,9 +100,8 @@ class RecipesTab extends StatelessWidget {
 class PrepareTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-          'Prepare Tab'), //  Aquí puedes mostrar la preparación de una receta
+    return const Center(
+      child: Text('Prepare Tab'),
     );
   }
 }
@@ -107,8 +109,8 @@ class PrepareTab extends StatelessWidget {
 class ShoppingTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Shopping Tab'), //  Aquí puedes mostrar la lista de compras
+    return const Center(
+      child: Text('Shopping Tab'),
     );
   }
 }
@@ -116,8 +118,8 @@ class ShoppingTab extends StatelessWidget {
 class MealPlanTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Meal Plan Tab'), //  Aquí puedes mostrar el plan de comidas
+    return const Center(
+      child: Text('Meal Plan Tab'),
     );
   }
 }

@@ -8,6 +8,7 @@ import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/add_recipe_screen.dart';
 import 'services/auth_service.dart';
+import 'services/recipe_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,18 +20,21 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(MyApp());
+  final recipeService = RecipeService(); // Inicializa recipeService
+
+  runApp(MyApp(recipeService: recipeService));
 }
 
 class MyApp extends StatelessWidget {
   final AuthService _authService = AuthService();
+  final RecipeService recipeService;
 
-  MyApp({super.key});
+  MyApp({super.key, required this.recipeService});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'RECIPE App',
+      title: 'REC App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -42,16 +46,17 @@ class MyApp extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasData) {
-            return const HomeScreen(); // Usa el constructor correcto
+            return const HomeScreen();
           }
-          return LoginScreen(); // Si no hay datos, muestra LoginScreen
+          return LoginScreen();
         },
       ),
       routes: {
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
         '/home': (context) => const HomeScreen(),
-        '/add_recipe': (context) => const AddRecipeScreen(),
+        '/add_recipe': (context) => AddRecipeScreen(
+            recipeService: recipeService), // Pasa recipeService aquí
       },
     );
   }

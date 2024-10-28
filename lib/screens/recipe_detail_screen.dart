@@ -76,6 +76,5 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 }
 
 extension on TextTheme {
-  TextStyle? get headline5 =>
-      headlineMedium; //  Usar headlineMedium o definir un nuevo estilo
+  TextStyle? get headline5 => headlineMedium;
 }

@@ -84,23 +84,28 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+      setState(() => _isLoading = true); // Muestra el indicador de carga
 
       try {
         final user = await _authService.signInWithEmailAndPassword(
-          email: _emailController.text,
-          password: _passwordController.text,
+          email: _emailController.text.trim(), // Usar .trim() aquí
+          password: _passwordController.text.trim(), // Usar .trim() aquí
         );
 
         if (user != null) {
+          // ignore: use_build_context_synchronously
           Navigator.pushReplacementNamed(context, '/home');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error de inicio de sesión.')),
+          );
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${e.toString()}')),
         );
       } finally {
-        setState(() => _isLoading = false);
+        setState(() => _isLoading = false); // Oculta el indicador de carga
       }
     }
   }

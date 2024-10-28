@@ -42,15 +42,15 @@ class MyApp extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasData) {
-            return HomeScreen();
+            return const HomeScreen(); // Usa el constructor correcto
           }
-          return LoginScreen();
+          return LoginScreen(); // Si no hay datos, muestra LoginScreen
         },
       ),
       routes: {
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
-        '/home': (context) => HomeScreen(),
+        '/home': (context) => const HomeScreen(),
         '/add_recipe': (context) => const AddRecipeScreen(),
       },
     );

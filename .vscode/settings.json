@@ -2,5 +2,8 @@
     "editor.wordBasedSuggestions": "matchingDocuments",
     "cSpell.words": [
         "nombre"
-    ]
+    ],
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "cmake.sourceDirectory": "C:/Users/braya/Desktop/electiva3taller/recetas_cocina/linux"
 }

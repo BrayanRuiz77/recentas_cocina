@@ -1,21 +1,31 @@
 buildscript {
-    ext {
-        buildToolsVersion = "34.0.0"
-        minSdkVersion = 23
-        compileSdkVersion = 34
-        targetSdkVersion = 34
-        ndkVersion = "26.1.10909125"
-        kotlinVersion = "1.9.24"
-    }
+    ext.kotlin_version = '1.9.0' // Define la versión de Kotlin aquí
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://www.jitpack.io' } // Repositorio común para algunas librerías
     }
     dependencies {
-        classpath("com.android.tools.build:gradle")
-        classpath("com.facebook.react:react-native-gradle-plugin")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+        classpath 'com.android.tools.build:gradle:8.1.1' //  Versión de Gradle (ajusta si es necesario)
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" //  Plugin de Kotlin
+        classpath 'com.google.gms:google-services:4.3.15' //  Plugin de Google Services (si usas Firebase)
     }
 }
 
-apply plugin: "com.facebook.react.rootproject"
+allprojects { //  Bloque allprojects para configurar los repositorios de todos los proyectos
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://www.jitpack.io' }
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

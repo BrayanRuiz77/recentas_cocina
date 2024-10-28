@@ -18,8 +18,8 @@ class AuthService {
   }) async {
     try {
       final UserCredential result = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
+        email: email.trim(), // Eliminar espacios en blanco
+        password: password.trim(), // Eliminar espacios en blanco
       );
 
       final user = result.user;
@@ -44,7 +44,6 @@ class AuthService {
     } catch (e) {
       if (e is FirebaseAuthException) {
         print('Error de Firebase Auth: ${e.code}, ${e.message}');
-
         if (e.code == 'weak-password') {
           throw Exception('La contraseña es demasiado débil.');
         } else if (e.code == 'email-already-in-use') {
@@ -64,19 +63,43 @@ class AuthService {
   }) async {
     try {
       final UserCredential result = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+        email: email.trim(), // Eliminar espacios en blanco
+        password: password.trim(), // Eliminar espacios en blanco
       );
 
-      if (result.user != null) {
+      final user = result.user; // Obtener el usuario del resultado
+
+      if (user != null) {
         final userData =
-            await _firestore.collection('users').doc(result.user!.uid).get();
-        return UserModel.fromJson(userData.data()!);
+            await _firestore.collection('users').doc(user.uid).get();
+
+        if (userData.data() != null) {
+          return UserModel.fromJson(userData.data()! as Map<String, dynamic>);
+        } else {
+          // Manejar el caso donde no se encuentran datos del usuario.
+          print('No se encontraron datos de usuario para ${user.uid}');
+          return null;
+        }
+      } else {
+        print('Error: Usuario nulo después del inicio de sesión.');
+        return null;
       }
-      return null;
     } catch (e) {
-      print('Error en el inicio de sesión: $e');
-      rethrow;
+      if (e is FirebaseAuthException) {
+        print('Error de Firebase Auth: ${e.code}, ${e.message}');
+        switch (e.code) {
+          case 'user-not-found':
+            throw Exception('Usuario no encontrado.');
+          case 'wrong-password':
+            throw Exception('Contraseña incorrecta.');
+          default:
+            throw Exception('Error de autenticación: ${e.message}');
+        }
+      } else {
+        print('Otro error de inicio de sesión: $e');
+        throw Exception(
+            'Error de inicio de sesión: $e'); // Relanza la excepción general.
+      }
     }
   }
 
@@ -97,16 +120,45 @@ class AuthService {
     }
   }
 
-  // Obtener usuario actual
+  // Obtener usuario actual (modificado)
   Future<UserModel?> getCurrentUser() async {
     try {
       final user = _auth.currentUser;
+
       if (user != null) {
-        final userData =
-            await _firestore.collection('users').doc(user.uid).get();
-        return UserModel.fromJson(userData.data()!);
+        print("UID del usuario actual: ${user.uid}");
+
+        final userData = await _firestore
+            .collection('users')
+            .doc(user.uid.trim())
+            .get(); // trim() añadido
+
+        if (userData.exists) {
+          // Verifica si el documento existe.
+          print(
+              'Datos de Firestore: ${userData.data()}'); // Print de depuración
+          return UserModel.fromJson(userData.data()! as Map<String, dynamic>);
+        } else {
+          print(
+              'No se encontraron datos del usuario en Firestore. Creando nuevo documento...');
+
+          // Crea un nuevo documento de usuario si no existe.
+          final userModel = UserModel(
+            id: user.uid,
+            email: user.email ?? '', // Maneja el caso donde el email es nulo
+            name: user
+                .displayName, // Puedes obtener el nombre de usuario si está disponible.
+            createdAt: DateTime.now(),
+          );
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .set(userModel.toJson());
+
+          return userModel;
+        }
       }
-      return null;
+      return null; // No hay usuario con sesión iniciada
     } catch (e) {
       print('Error al obtener usuario actual: $e');
       return null;
